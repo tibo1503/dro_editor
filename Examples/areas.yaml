@@ -1,0 +1,68 @@
+- area: Salle de classe 1
+  background: Class Room 1_HD
+  bglock: false
+  evidence_mod: CM
+  locking_allowed: true
+  iniswap_allowed: true
+  rp_getareas_allowed: false
+  reachable_areas: Couloir 1
+  rp_area: true
+  scream_range: Couloir 1
+- area: Salle de proces
+  background: Class Trial Debate Room DR1-1_HD
+  bglock: false
+  evidence_mod: CM
+  locking_allowed: true
+  iniswap_allowed: true
+  rollp_allowed: false
+  tl_allowed: false
+  reachable_areas: Couloir 1, Salle des donnees
+- area: Salle des donnees
+  background: Data Room_HD
+  bglock: false
+  evidence_mod: CM
+  locking_allowed: true
+  iniswap_allowed: true
+  rp_getareas_allowed: false
+  reachable_areas: Salle de proces, Ordinateur du Game Master
+  rp_area: true
+- area: Ordinateur du Game Master
+  background: Computer Room_HD
+  bglock: false
+  evidence_mod: CM
+  locking_allowed: true
+  iniswap_allowed: true
+  rp_getareas_allowed: false
+  reachable_areas: Salle des donnees
+  rp_area: true
+  scream_range: Salle des donnees
+- area: Image present sur l'ecran
+  background: Bloody Classroom_HD
+  bglock: false
+  evidence_mod: CM
+  locking_allowed: true
+  iniswap_allowed: true
+  rp_getareas_allowed: false
+  reachable_areas: Ordinateur du Game Master
+  rp_area: true
+  scream_range: Ordinateur du Game Master
+- area: Entree
+  background: Entrance_HD
+  bglock: false
+  evidence_mod: CM
+  locking_allowed: true
+  iniswap_allowed: true
+  rp_getareas_allowed: false
+  reachable_areas: Couloir 1
+  rp_area: true
+  scream_range: Couloir 1
+- area: Couloir 1
+  background: Hallway 1_HD
+  bglock: false
+  evidence_mod: CM
+  locking_allowed: true
+  iniswap_allowed: true
+  rp_getareas_allowed: false
+  reachable_areas: Entree, Couloir 2, Toilette Homme, Toilette Femme, Salle audio visuel, Stockage de l'ecole, Salle de classe 1, Infirmerie, La porte du desespoir, Couloir du gymnase, Hall du dortoire
+  rp_area: true
+  scream_range: Entree, Couloir 2, Toilette Homme, Toilette Femme, Salle audio visuel, Stockage de l'ecole, Salle de classe 1, Infirmerie, La porte du desespoir, Couloir du gymnase, Hall du dortoire
