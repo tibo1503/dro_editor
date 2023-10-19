@@ -1,3 +1,6 @@
+use crate::worker::model::structs::DRODataManager;
+use super::super::side_panel::SelectedData;
+
 use egui::*;
 
 use super::editor_trait::*;
@@ -18,7 +21,7 @@ impl RoomEditor {
 }
 
 impl Editor for RoomEditor {
-    fn view(&mut self, ui: &mut Ui) {
+    fn view(&mut self, dro: &mut DRODataManager, selected_data: &mut SelectedData, ui: &mut Ui) {
         egui::Grid::new("some_unique_id").show(ui, |ui| {
             ui.menu_button("Add field", |ui| {
                 if ui.button("Bool row").clicked() {

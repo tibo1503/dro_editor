@@ -14,6 +14,8 @@ use egui::*;
 
 pub struct MyApp {
     side_panels: Vec<Box<dyn side_panel::SidePanel>>,
+    selected_area: side_panel::SelectedData,
+
     editor: Vec<Box<dyn Editor>>,
     
     dro_struct: DRODataManager, 
@@ -23,6 +25,8 @@ impl Default for MyApp {
     fn default() -> Self {
         Self {
             side_panels: vec![Box::new(side_panel::RoomSidePanel::default())],
+            selected_area: side_panel::SelectedData::default(),
+            
             editor: vec![Box::new(RoomEditor::new())],
 
             dro_struct: DRODataManager::new(),
@@ -50,7 +54,7 @@ impl eframe::App for MyApp {
          });
         
         egui::SidePanel::left("my_left_panel").show(ctx, |ui| {
-            self.side_panels[0].disp(ui);
+            self.side_panels[0].disp(&mut self.dro_struct, &mut self.selected_area, ui);
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
@@ -67,7 +71,7 @@ impl MyApp {
             self.editor.push(Box::new(RoomEditor::new()));
         }
 
-        self.editor[0].view(ui);
+        self.editor[0].view(&mut self.dro_struct, &mut self.selected_area, ui);
     }
 
     // TODO: Remove code sample
