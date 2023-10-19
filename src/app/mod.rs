@@ -4,6 +4,8 @@ use editor::{
     room::RoomEditor
 };
 
+mod side_panel;
+
 use crate::worker::model::structs::{
     DRODataManager
 };
@@ -11,19 +13,19 @@ use crate::worker::model::structs::{
 use egui::*;
 
 pub struct MyApp {
-    dro_struct: DRODataManager,
-
+    side_panels: Vec<Box<dyn side_panel::SidePanel>>,
     editor: Vec<Box<dyn Editor>>,
-    selected_editor: usize,
+    
+    dro_struct: DRODataManager, 
 }
 
 impl Default for MyApp {
     fn default() -> Self {
         Self {
-            dro_struct: DRODataManager::new(),
-
+            side_panels: vec![Box::new(side_panel::RoomSidePanel::default())],
             editor: vec![Box::new(RoomEditor::new())],
-            selected_editor: 3     
+
+            dro_struct: DRODataManager::new(),
         }
     }
 }
@@ -48,8 +50,7 @@ impl eframe::App for MyApp {
          });
         
         egui::SidePanel::left("my_left_panel").show(ctx, |ui| {
-            self.room_list(ui);
-
+            self.side_panels[0].disp(ui);
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
@@ -67,18 +68,6 @@ impl MyApp {
         }
 
         self.editor[0].view(ui);
-
-        if let Some(editor) = self.editor.get(self.selected_editor) {
-            //editor.view(ui);
-        }
-    }
-
-    fn room_list(&mut self, ui: &mut Ui) {
-        ui.vertical(|ui| {ScrollArea::vertical().show(ui, |ui| {
-            for item in 1..=50 {
-                ui.selectable_value(&mut self.selected_editor, item, format!("Item N°{}", item));
-            }
-        })});
     }
 
     // TODO: Remove code sample
