@@ -20,21 +20,22 @@ impl RoomEditor {
 impl Editor for RoomEditor {
     fn view(&mut self, ui: &mut Ui) {
         egui::Grid::new("some_unique_id").show(ui, |ui| {
-            ui.add(egui::TextEdit::singleline(&mut self.test).hint_text("Write something here"));
-            if ui.button("Bool row").clicked() {
-                self.aled.push(Box::new(BoolRow {
-                    field_name: "field name".to_string(),
-                    data: false,
-                    remove: false,
-                }));
-            };
-            if ui.button("String row").clicked() {
-                self.aled.push(Box::new(StringRow {
-                    field_name: "field name".to_string(),
-                    data: self.test.clone(),
-                    remove: false,
-                }));
-            };
+            ui.menu_button("Add field", |ui| {
+                if ui.button("Bool row").clicked() {
+                    self.aled.push(Box::new(BoolRow {
+                        field_name: "field name".to_string(),
+                        data: false,
+                        remove: false,
+                    }));
+                };
+                if ui.button("String row").clicked() {
+                    self.aled.push(Box::new(StringRow {
+                        field_name: "field name".to_string(),
+                        data: self.test.clone(),
+                        remove: false,
+                    }));
+                };
+            });
             ui.end_row();
 
             ui.label("Field");
