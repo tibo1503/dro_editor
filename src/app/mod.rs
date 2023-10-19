@@ -23,7 +23,7 @@ impl Default for MyApp {
             dro_struct: DRODataManager::new(),
 
             editor: vec![Box::new(RoomEditor::new())],
-            selected_editor: 0            
+            selected_editor: 3     
         }
     }
 }
@@ -75,9 +75,8 @@ impl MyApp {
 
     fn room_list(&mut self, ui: &mut Ui, height: f32) {
         ui.vertical(|ui| {ScrollArea::vertical().min_scrolled_height(height).show(ui, |ui| {
-            let mut truc = 5u32;
-            for item in 1..=50u32 {
-                ui.selectable_value(&mut truc, item, format!("Item N°{}", item));
+            for item in 1..=50 {
+                ui.selectable_value(&mut self.selected_editor, item, format!("Item N°{}", item));
             }
         })});
     }
