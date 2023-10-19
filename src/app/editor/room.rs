@@ -21,7 +21,6 @@ impl Editor for RoomEditor {
         egui::Grid::new("some_unique_id").show(ui, |ui| {
             ui.add(egui::TextEdit::singleline(&mut self.test).hint_text("Write something here"));
             if ui.button("aled").clicked() {
-                //self.aled.push(self.test.clone());
                 self.aled.push(Box::new(BoolRow {
                     field_name: "caca".to_string(),
                     data: false,
@@ -29,7 +28,6 @@ impl Editor for RoomEditor {
                 }));
             };
             if ui.button("woula").clicked() {
-                //self.aled.push(self.test.clone());
                 self.aled.push(Box::new(StringRow {
                     field_name: "caca".to_string(),
                     data: self.test.clone(),
@@ -49,16 +47,7 @@ impl Editor for RoomEditor {
                 if row_val.remove_required() {
                     remove_index = Option::Some(index);
                 }
-
-                //ui.horizontal(|ui| {
-                //    if ui.button("❌").clicked() {
-                //        remove_index = Option::Some(index);
-                //    };
-                //    ui.label(line_str.clone());
-                //});
-                //ui.add(egui::TextEdit::singleline(line_str).hint_text("Write something here"));
-
-                //ui.end_row();
+                ui.end_row();
             }
             remove_index.map(|x| self.aled.remove(x));
 
@@ -105,11 +94,9 @@ impl RoomEditorRow for BoolRow {
                 //remove_index = Option::Some(index);
                 self.remove = true;
             };
-            ui.label(self.field_name.clone());
+            ui.label(&self.field_name);
         });
         ui.checkbox(&mut self.data, "");
-
-        ui.end_row();
     }
 
     fn remove_required(&self) -> bool {
@@ -131,11 +118,9 @@ impl RoomEditorRow for StringRow {
                 //remove_index = Option::Some(index);
                 self.remove = true;
             };
-            ui.label(self.field_name.clone());
+            ui.label(&self.field_name);
         });
         ui.add(egui::TextEdit::singleline(&mut self.data).hint_text("Need a value"));
-
-        ui.end_row();
     }
 
     fn remove_required(&self) -> bool {

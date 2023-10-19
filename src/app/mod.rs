@@ -26,11 +26,20 @@ impl Default for MyApp {
 
 impl eframe::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        egui::CentralPanel::default().show(ctx, |ui| {
+        egui::TopBottomPanel::top("my_panel").show(ctx, |ui| {
             ui.horizontal(|ui| {
-                self.room_list(ui, 300.0);
-                self.right_panel(ui);
-            });
+                ui.button("File");
+                ui.label("Hello World!");
+            })
+         });
+        
+        egui::SidePanel::left("my_left_panel").show(ctx, |ui| {
+            self.room_list(ui, 300.0);
+
+        });
+
+        egui::CentralPanel::default().show(ctx, |ui| {
+            self.right_panel(ui);
         });
     }
 }
