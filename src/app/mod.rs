@@ -32,8 +32,18 @@ impl eframe::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::TopBottomPanel::top("my_panel").show(ctx, |ui| {
             ui.horizontal(|ui| {
-                ui.button("File");
-                ui.label("Hello World!");
+                ui.menu_button("Project", |ui| {
+                    let _ = ui.button("Load");
+                    let _ = ui.button("Close");
+                    ui.menu_button("Previous", |ui| {
+                        for projects in 1..10 {
+                            let _ = ui.button(format!("Project N°{}", projects));
+                        }
+                    });
+                });
+                ui.menu_button("Settings", |ui| {
+                    let _ = ui.button("Settings");
+                })
             })
          });
         
