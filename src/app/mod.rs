@@ -48,7 +48,7 @@ impl eframe::App for MyApp {
          });
         
         egui::SidePanel::left("my_left_panel").show(ctx, |ui| {
-            self.room_list(ui, 300.0);
+            self.room_list(ui);
 
         });
 
@@ -73,8 +73,8 @@ impl MyApp {
         }
     }
 
-    fn room_list(&mut self, ui: &mut Ui, height: f32) {
-        ui.vertical(|ui| {ScrollArea::vertical().min_scrolled_height(height).show(ui, |ui| {
+    fn room_list(&mut self, ui: &mut Ui) {
+        ui.vertical(|ui| {ScrollArea::vertical().show(ui, |ui| {
             for item in 1..=50 {
                 ui.selectable_value(&mut self.selected_editor, item, format!("Item N°{}", item));
             }
