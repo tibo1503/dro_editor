@@ -10,7 +10,7 @@ pub struct RoomEditor {
 impl RoomEditor {
     pub fn new() -> Self {
         Self {
-            test: "ALED".to_string(),
+            test: "".to_string(),
             aled: Vec::new(),
         }
     }
@@ -20,16 +20,16 @@ impl Editor for RoomEditor {
     fn view(&mut self, ui: &mut Ui) {
         egui::Grid::new("some_unique_id").show(ui, |ui| {
             ui.add(egui::TextEdit::singleline(&mut self.test).hint_text("Write something here"));
-            if ui.button("aled").clicked() {
+            if ui.button("Bool row").clicked() {
                 self.aled.push(Box::new(BoolRow {
-                    field_name: "caca".to_string(),
+                    field_name: "field name".to_string(),
                     data: false,
                     remove: false,
                 }));
             };
-            if ui.button("woula").clicked() {
+            if ui.button("String row").clicked() {
                 self.aled.push(Box::new(StringRow {
-                    field_name: "caca".to_string(),
+                    field_name: "field name".to_string(),
                     data: self.test.clone(),
                     remove: false,
                 }));
@@ -37,7 +37,7 @@ impl Editor for RoomEditor {
             ui.end_row();
 
             ui.label("Field");
-            ui.label("Action what");
+            ui.label("value");
             ui.end_row();
 
             let mut remove_index: Option<usize> = Option::None;
