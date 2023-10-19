@@ -12,9 +12,9 @@ use std::sync::Arc;
 use std::collections::HashMap;
 
 pub struct DRODataManager {
-    areas: AreaManager,
-    character: HashMap<String, Character>,
-    background: HashMap<String, Background>,
+    pub areas: AreaManager,
+    pub character: HashMap<String, Character>,
+    pub background: HashMap<String, Background>,
 }
 
 impl DRODataManager {

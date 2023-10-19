@@ -44,6 +44,13 @@ impl AreaWeakList {
         }
     }
 
+    pub fn add_by_name(&mut self, name: String) -> Result<(), AreaError> {
+        self.add(Rc::downgrade(&Rc::new(RefCell::new(Area {
+            name,
+            ..Area::default()
+        }))))
+    }
+
     fn get_pos_by_name(&self, name: &String) -> Option<usize> {
         self
             .data
