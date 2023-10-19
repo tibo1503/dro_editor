@@ -2,6 +2,7 @@ use egui::*;
 
 use super::editor_trait::*;
 
+// -=Room editor=-
 pub struct RoomEditor {
     test: String,
     aled: Vec<Box<dyn RoomEditorRow>>
@@ -50,21 +51,6 @@ impl Editor for RoomEditor {
                 ui.end_row();
             }
             remove_index.map(|x| self.aled.remove(x));
-
-            /*
-            ui.label(self.test.as_str());
-            ui.label("First row, second column");
-            ui.end_row();
-        
-            ui.label("Second row, first column");
-            ui.label("Second row, second column");
-            //ui.label("Second row, third column");
-            ui.end_row();
-        
-            ui.horizontal(|ui| { ui.label("Same"); ui.label("cell"); });
-            ui.label(self.test.as_str());
-            ui.end_row();
-            */
         });
     }
 
@@ -91,7 +77,6 @@ impl RoomEditorRow for BoolRow {
     fn disp(&mut self, ui: &mut Ui) {
         ui.horizontal(|ui| {
             if ui.button("❌").clicked() {
-                //remove_index = Option::Some(index);
                 self.remove = true;
             };
             ui.label(&self.field_name);
@@ -115,7 +100,6 @@ impl RoomEditorRow for StringRow {
     fn disp(&mut self, ui: &mut Ui) {
         ui.horizontal(|ui| {
             if ui.button("❌").clicked() {
-                //remove_index = Option::Some(index);
                 self.remove = true;
             };
             ui.label(&self.field_name);
