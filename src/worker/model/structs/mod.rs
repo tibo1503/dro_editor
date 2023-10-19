@@ -18,7 +18,7 @@ pub struct DRODataManager {
 }
 
 impl DRODataManager {
-    fn new() -> DRODataManager {
+    pub fn new() -> DRODataManager {
         DRODataManager {
             areas: AreaManager::new(),
             character: HashMap::new(),
