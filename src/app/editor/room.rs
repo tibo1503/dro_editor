@@ -55,6 +55,20 @@ impl Editor for RoomEditor {
                 ui.end_row();
             }
             remove_index.map(|x| self.aled.remove(x));
+
+            // Verify if Area is available
+            if let Option::Some(area_rc) = &selected_data.area {
+                if let Option::Some(area_ref_cell) = area_rc.upgrade() {
+                    let area = area_ref_cell.borrow_mut();
+                    std::cell::RefMut::map(area, |area| {
+                        ui.horizontal(|ui| {
+                            ui.label(&area.name);
+                        });
+                        ui.add(egui::TextEdit::singleline(&mut area.name).hint_text("Need a value"));
+                        area
+                    });
+                };
+            }
         });
     }
 
