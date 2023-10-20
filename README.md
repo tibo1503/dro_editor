@@ -19,5 +19,5 @@ A Danganronpa Online data editor with a lot of (possible) features
 - [ ] .zip client exporter
 - [ ] .zip server exporter
 - [ ] Launcher
-- [ ] Stable version
+- [ ] Stable release
 - [ ] Good code practice (a day)
