@@ -7,7 +7,7 @@ use egui::*;
 
 #[derive(Default)]
 pub struct SelectedData {
-    area: String
+    pub area: String
 }
 
 pub trait SidePanel {
