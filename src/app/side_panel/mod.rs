@@ -29,7 +29,9 @@ impl Default for RoomSidePanel {
 impl SidePanel for RoomSidePanel {
     fn disp(&mut self, dro: &mut DRODataManager, selected_data: &mut SelectedData, ui: &mut Ui) {
         if ui.button("add").clicked() {
-            dro.areas.add_by_name(&"a".to_string());
+            let name = "".to_string();
+            dro.areas.add_by_name(&name);
+            selected_data.area = name;
         }
         ui.vertical(|ui| {ScrollArea::vertical().show(ui, |ui| {
             let area_list = dro.areas.get_name_list();
