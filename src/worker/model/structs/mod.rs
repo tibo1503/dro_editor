@@ -43,8 +43,8 @@ mod dro_manager_test {
 
         let mut ddm = DRODataManager::new();
 
-        let area_a = ddm.areas.add_by_name(&"A".to_string());
-        let area_b = ddm.areas.add_by_name(&"B".to_string());
+        let area_a = ddm.areas.add_by_name(&"A".to_string()).unwrap();
+        let area_b = ddm.areas.add_by_name(&"B".to_string()).unwrap();
     
         let area_a_ref = area_a.upgrade().unwrap();
         

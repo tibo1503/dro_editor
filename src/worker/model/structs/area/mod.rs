@@ -14,15 +14,19 @@ impl AreaManager {
         AreaManager { data: Vec::new() }
     }
 
-    pub fn add_by_name(&mut self, name: &String) -> AreaRefering {        
+    pub fn add_by_name(&mut self, name: &String) -> Option<AreaRefering> {        
         let mut area = Area::default();
         area.name = name.clone();
+
+        if self.get_by_name(name).is_some() {
+            return Option::None
+        }
 
         let area_rc = Rc::new(RefCell::new(area));
         
         let weak = Rc::downgrade(&area_rc);
         self.data.push(area_rc);
-        weak
+        Option::Some(weak)
     }
 
     fn get_pos_by_name(&self, name: &String) -> Option<usize> {
@@ -75,10 +79,10 @@ mod tests_area_manager {
 
         // Adding A and B
         let a_name = "A".to_string();
-        let a = manager.add_by_name(&"A".to_string());
+        let a = manager.add_by_name(&"A".to_string()).unwrap();
         
         let b_name = "B".to_string();
-        let b = manager.add_by_name(&"B".to_string());
+        let b = manager.add_by_name(&"B".to_string()).unwrap();
 
         // Verify getter
         assert!(Rc::ptr_eq(
