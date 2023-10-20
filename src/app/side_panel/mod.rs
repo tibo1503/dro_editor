@@ -14,17 +14,8 @@ pub trait SidePanel {
     fn disp(&mut self, dro: &mut DRODataManager, selected_data: &mut SelectedData, ui: &mut Ui);
 }
 
-pub struct RoomSidePanel {
-    selected_editor: usize
-}
-
-impl Default for RoomSidePanel {
-    fn default() -> Self {
-        Self {
-            selected_editor: 0 
-        }
-    }
-}
+#[derive(Default)]
+pub struct RoomSidePanel {}
 
 impl SidePanel for RoomSidePanel {
     fn disp(&mut self, dro: &mut DRODataManager, selected_data: &mut SelectedData, ui: &mut Ui) {
