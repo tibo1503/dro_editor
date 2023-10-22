@@ -7,13 +7,13 @@ use super::editor_trait::*;
 
 // -=Room editor=-
 pub struct RoomEditor {
-    test: String,
+    search_words: String,
 }
 
 impl RoomEditor {
     pub fn new() -> Self {
         Self {
-            test: "".to_string(),
+            search_words: "".to_string(),
         }
     }
 }
@@ -26,7 +26,7 @@ impl Editor for RoomEditor {
                 if let Option::Some(area_ref_cell) = area_rc.upgrade() {
                     // Display all the field
                     std::cell::RefMut::map(area_ref_cell.borrow_mut(), |area| {
-                        let mut field_collect = FieldCollect::new();
+                        let mut field_collect = FieldCollect::new(&mut self.search_words);
 
                         // Room info
                         let mut field = StringField::new(
@@ -181,14 +181,16 @@ impl Editor for RoomEditor {
 // Field collect
 struct FieldCollect<'a> {
     fields: Vec<&'a mut dyn Field>,
-    optional_fields: Vec<&'a mut dyn OptionalField>
+    optional_fields: Vec<&'a mut dyn OptionalField>,
+    search_words: &'a mut String
 }
 
 impl<'a> FieldCollect<'a> {
-    fn new() -> Self {
+    fn new(search: &'a mut String) -> Self {
         Self {
             fields: Vec::new(),
-            optional_fields: Vec::new()
+            optional_fields: Vec::new(),
+            search_words: search
         }
     }
 
@@ -232,8 +234,9 @@ impl<'a> FieldCollect<'a> {
 
         // Adding optional fields
         ui.menu_button("+".to_string(), |ui| {
+            ui.text_edit_singleline(self.search_words);
             for ref mut item in &mut self.optional_fields {
-                if !item.disp_val() {
+                if !item.disp_val() && item.get_field_name().to_lowercase().contains(&self.search_words.to_lowercase()) {
                     let mut add = false;
                     if ui.button(item.get_field_name()).clicked() {
                         add = true
