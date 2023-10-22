@@ -26,27 +26,101 @@ impl Editor for RoomEditor {
                 if let Option::Some(area_ref_cell) = area_rc.upgrade() {
                     // Display all the field
                     std::cell::RefMut::map(area_ref_cell.borrow_mut(), |area| {
-                        let mut caca = FieldCollect::new();
+                        let mut field_collect = FieldCollect::new();
 
-                        let mut field = OptionalBoolRefField::new(
-                            
+                        // Room info
+                        let mut field = StringField::new(
+                            "Area".to_string(), 
+                            &mut area.name
+                        );
+                        field_collect.add_field(&mut field);
+                        let mut field = OptionalStringRefField::new(
+                            "default_description".to_string(), 
+                            &mut area.default_description, 
+                            "".to_string()
+                        );
+                        field_collect.add_optional_field(&mut field);
+
+                        // Background
+                        let mut field = OptionalBoolRefField::new(    
                             "cbg_allowed".to_string(),
                             &mut area.cbg_allowed,
                             false
                         );
-                        caca.add_optional_field(&mut field);
+                        field_collect.add_optional_field(&mut field);
+
+                        let mut field = OptionalBoolRefField::new(    
+                            "bglock".to_string(),
+                            &mut area.bglock,
+                            false
+                        );
+                        field_collect.add_optional_field(&mut field);
+
+
 
                         let mut field = OptionalBoolRefField::new(
                             "has_lights".to_string(),
                             &mut area.has_lights,
                             false
                         );
-                        caca.add_optional_field(&mut field);
+                        field_collect.add_optional_field(&mut field);
 
-                        let mut field = StringField::new("Area".to_string(), &mut area.name);
-                        caca.add_field(&mut field);
+                        // Area
+                        //
+                        let mut field = OptionalBoolRefField::new(    
+                            "change_reachability_allowed".to_string(),
+                            &mut area.change_reachability_allowed,
+                            false
+                        );
+                        field_collect.add_optional_field(&mut field);
 
-                        caca.disp(ui);
+                        //
+                        
+                        //
+                        let mut field = OptionalBoolRefField::new(    
+                            "locking_allowed".to_string(),
+                            &mut area.locking_allowed,
+                            false
+                        );
+                        field_collect.add_optional_field(&mut field);
+
+                        //
+                        let mut field = OptionalBoolRefField::new(    
+                            "private_area".to_string(),
+                            &mut area.private_area,
+                            false
+                        );
+                        field_collect.add_optional_field(&mut field);
+                        
+                        //
+                        let mut field = OptionalBoolRefField::new(    
+                            "rp_getarea_allowed".to_string(),
+                            &mut area.rp_getarea_allowed,
+                            false
+                        );
+                        field_collect.add_optional_field(&mut field);
+
+                        let mut field = OptionalBoolRefField::new(    
+                            "rp_getareas_allowed".to_string(),
+                            &mut area.rp_getareas_allowed,
+                            false
+                        );
+                        field_collect.add_optional_field(&mut field);
+                        //
+                        let mut field = OptionalBoolRefField::new(    
+                            "lobby_area".to_string(),
+                            &mut area.lobby_area,
+                            false
+                        );
+                        field_collect.add_optional_field(&mut field);
+                        
+                        // Character
+                        // Message
+                        // AFK
+                        // Other
+
+                        // End field collect
+                        field_collect.disp(ui);
 
                         area
                     });
@@ -168,6 +242,8 @@ trait OptionalField {
     fn disp_state(&mut self, statue: bool);
 }
 
+// -- Optional
+// Bool
 struct OptionalBoolRefField<'a> {
     data: &'a mut Option<bool>,
     default_value: bool,
@@ -202,6 +278,47 @@ impl OptionalField for OptionalBoolRefField<'_> {
     fn disp_state(&mut self, state: bool) {
         if state {
             *self.data = Option::Some(self.default_value);
+        } else {
+            *self.data = Option::None;
+        }
+    }
+}
+
+// String
+struct OptionalStringRefField<'a> {
+    data: &'a mut Option<String>,
+    default_value: String,
+    field_name: String
+}
+
+impl<'a> OptionalStringRefField<'a> {
+    fn new(field_name: String, data: &'a mut Option<String>, default_value: String) -> Self {
+        Self {
+            data,
+            default_value,
+            field_name
+        }
+    }
+}
+
+impl OptionalField for OptionalStringRefField<'_> {
+    fn disp(&mut self, ui: &mut Ui) {
+        if let Option::Some(ref mut data) = &mut self.data {
+            ui.text_edit_singleline(data);
+        }
+    }
+    
+    fn disp_val(&self) -> bool {
+        self.data.is_some()
+    }
+
+    fn get_field_name(&self) -> String {
+        self.field_name.clone()
+    }
+    
+    fn disp_state(&mut self, state: bool) {
+        if state {
+            *self.data = Option::Some(self.default_value.clone());
         } else {
             *self.data = Option::None;
         }
