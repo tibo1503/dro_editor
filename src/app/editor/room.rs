@@ -1,4 +1,4 @@
-use crate::worker::model::structs::DRODataManager;
+use crate::worker::model::structs::{DRODataManager, area::StrongAreaRefering};
 use super::super::side_panel::SelectedData;
 
 use egui::*;
@@ -8,14 +8,12 @@ use super::editor_trait::*;
 // -=Room editor=-
 pub struct RoomEditor {
     test: String,
-    aled: Vec<Box<dyn RoomEditorRow>>
 }
 
 impl RoomEditor {
     pub fn new() -> Self {
         Self {
             test: "".to_string(),
-            aled: Vec::new(),
         }
     }
 }
@@ -23,48 +21,33 @@ impl RoomEditor {
 impl Editor for RoomEditor {
     fn view(&mut self, dro: &mut DRODataManager, selected_data: &mut SelectedData, ui: &mut Ui) {
         egui::Grid::new("some_unique_id").show(ui, |ui| {
-            ui.menu_button("Add field", |ui| {
-                if ui.button("Bool row").clicked() {
-                    self.aled.push(Box::new(BoolRow {
-                        field_name: "field name".to_string(),
-                        data: false,
-                        remove: false,
-                    }));
-                };
-                if ui.button("String row").clicked() {
-                    self.aled.push(Box::new(StringRow {
-                        field_name: "field name".to_string(),
-                        data: self.test.clone(),
-                        remove: false,
-                    }));
-                };
-            });
-            ui.end_row();
-
-            ui.label("Field");
-            ui.label("value");
-            ui.end_row();
-
-            let mut remove_index: Option<usize> = Option::None;
-            for (index, row_val) in self.aled.iter_mut().enumerate() {
-                row_val.disp(ui);
-
-                if row_val.remove_required() {
-                    remove_index = Option::Some(index);
-                }
-                ui.end_row();
-            }
-            remove_index.map(|x| self.aled.remove(x));
-
             // Verify if Area is available
             if let Option::Some(area_rc) = &selected_data.area {
                 if let Option::Some(area_ref_cell) = area_rc.upgrade() {
-                    let area = area_ref_cell.borrow_mut();
-                    std::cell::RefMut::map(area, |area| {
-                        ui.horizontal(|ui| {
-                            ui.label(&area.name);
-                        });
-                        ui.add(egui::TextEdit::singleline(&mut area.name).hint_text("Need a value"));
+                    // Display all the field
+                    std::cell::RefMut::map(area_ref_cell.borrow_mut(), |area| {
+                        let mut caca = FieldCollect::new();
+
+                        let mut field = OptionalBoolRefField::new(
+                            
+                            "cbg_allowed".to_string(),
+                            &mut area.cbg_allowed,
+                            false
+                        );
+                        caca.add_optional_field(&mut field);
+
+                        let mut field = OptionalBoolRefField::new(
+                            "has_lights".to_string(),
+                            &mut area.has_lights,
+                            false
+                        );
+                        caca.add_optional_field(&mut field);
+
+                        let mut field = StringField::new("Area".to_string(), &mut area.name);
+                        caca.add_field(&mut field);
+
+                        caca.disp(ui);
+
                         area
                     });
                 };
@@ -77,55 +60,150 @@ impl Editor for RoomEditor {
     }
 }
 
+// -=Fields=-
+// Field collect
+struct FieldCollect<'a> {
+    fields: Vec<&'a mut dyn Field>,
+    optional_fields: Vec<&'a mut dyn OptionalField>
+}
 
-// -=Rows=-
-trait RoomEditorRow {
+impl<'a> FieldCollect<'a> {
+    fn new() -> Self {
+        Self {
+            fields: Vec::new(),
+            optional_fields: Vec::new()
+        }
+    }
+
+    fn add_field(&mut self, field: &'a mut dyn Field) {
+        self.fields.push(field);
+    }
+
+    fn add_optional_field(&mut self, field: &'a mut dyn OptionalField) {
+        self.optional_fields.push(field);
+    }
+
+    fn disp(&mut self, ui: &mut Ui) {
+        ui.label("Field");
+        ui.label("value");
+        ui.end_row();
+
+        // Default fields
+        for ref mut item in &mut self.fields {
+            ui.label(item.get_field_name());
+            item.disp(ui);
+            ui.end_row();
+        }
+
+        // Added fields
+        for ref mut item in &mut self.optional_fields {
+            if item.disp_val() {
+                ui.horizontal(|ui| {
+                    let mut remove = false;
+                    if ui.button("-").clicked() {
+                        remove = true;
+                    }
+                    if remove {
+                        item.disp_state(false);
+                    }
+                    ui.label(item.get_field_name());
+                });
+                item.disp(ui);
+                ui.end_row()
+            }
+        }
+
+        // Adding optional fields
+        ui.menu_button("+".to_string(), |ui| {
+            for ref mut item in &mut self.optional_fields {
+                if !item.disp_val() {
+                    let mut add = false;
+                    if ui.button(item.get_field_name()).clicked() {
+                        add = true
+                    }
+                    if add {
+                        item.disp_state(true);
+                    }
+                }
+            }
+        });
+        ui.end_row();
+    }
+}
+
+// Fields
+trait Field {
     fn disp(&mut self, ui: &mut Ui);
-    fn remove_required(&self) -> bool;
+    fn get_field_name(&self) -> String;
 }
 
-// Bool
-struct BoolRow {
-    field_name: String,
-    data: bool,
-    remove: bool
+struct StringField<'a> {
+    data: &'a mut String,
+    field_name: String
 }
 
-impl RoomEditorRow for BoolRow {
+impl<'a> StringField<'a> {
+    fn new(field_name: String, data: &'a mut String) -> StringField{
+        StringField {
+            data,
+            field_name
+        }
+    }
+}
+
+impl Field for StringField<'_> {
     fn disp(&mut self, ui: &mut Ui) {
-        ui.horizontal(|ui| {
-            if ui.button("❌").clicked() {
-                self.remove = true;
-            };
-            ui.label(&self.field_name);
-        });
-        ui.checkbox(&mut self.data, "");
+        ui.text_edit_singleline(self.data);
     }
 
-    fn remove_required(&self) -> bool {
-        self.remove
+    fn get_field_name(&self) -> String {
+        self.field_name.clone()
     }
 }
 
-// String
-struct StringRow {
-    field_name: String,
-    data: String,
-    remove: bool
+trait OptionalField {
+    fn disp(&mut self, ui: &mut Ui);
+    fn disp_val(&self) -> bool;
+    fn get_field_name(&self) -> String;
+    fn disp_state(&mut self, statue: bool);
 }
 
-impl RoomEditorRow for StringRow {
+struct OptionalBoolRefField<'a> {
+    data: &'a mut Option<bool>,
+    default_value: bool,
+    field_name: String
+}
+
+impl<'a> OptionalBoolRefField<'a> {
+    fn new(field_name: String, data: &'a mut Option<bool>, default_value: bool, ) -> Self {
+        Self {
+            data,
+            default_value,
+            field_name
+        }
+    }
+}
+
+impl OptionalField for OptionalBoolRefField<'_> {
     fn disp(&mut self, ui: &mut Ui) {
-        ui.horizontal(|ui| {
-            if ui.button("❌").clicked() {
-                self.remove = true;
-            };
-            ui.label(&self.field_name);
-        });
-        ui.add(egui::TextEdit::singleline(&mut self.data).hint_text("Need a value"));
+        if let Option::Some(ref mut data) = &mut self.data {
+            ui.checkbox(data, "");
+        }
+    }
+    
+    fn disp_val(&self) -> bool {
+        self.data.is_some()
     }
 
-    fn remove_required(&self) -> bool {
-        self.remove
+    fn get_field_name(&self) -> String {
+        self.field_name.clone()
+    }
+    
+    fn disp_state(&mut self, state: bool) {
+        if state {
+            *self.data = Option::Some(self.default_value);
+        } else {
+            *self.data = Option::None;
+        }
     }
 }
