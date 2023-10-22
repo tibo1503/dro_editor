@@ -115,9 +115,52 @@ impl Editor for RoomEditor {
                         field_collect.add_optional_field(&mut field);
                         
                         // Character
+
                         // Message
+                        let mut field = OptionalBoolRefField::new(    
+                            "iniswap_allowed".to_string(),
+                            &mut area.iniswap_allowed,
+                            false
+                        );
+                        field_collect.add_optional_field(&mut field);
+
+                        let mut field = OptionalBoolRefField::new(    
+                            "global_allowed".to_string(),
+                            &mut area.global_allowed,
+                            false
+                        );
+                        field_collect.add_optional_field(&mut field);
+
                         // AFK
+                        
                         // Other
+                        let mut field = OptionalBoolRefField::new(    
+                            "song_switch_allowed".to_string(),
+                            &mut area.song_switch_allowed,
+                            false
+                        );
+                        field_collect.add_optional_field(&mut field);
+                        
+                        let mut field = OptionalBoolRefField::new(    
+                            "rollp_allowed".to_string(),
+                            &mut area.rollp_allowed,
+                            false
+                        );
+                        field_collect.add_optional_field(&mut field);
+
+                        let mut field = OptionalBoolRefField::new(    
+                            "bullet".to_string(),
+                            &mut area.bullet,
+                            false
+                        );
+                        field_collect.add_optional_field(&mut field);
+
+                        let mut field = OptionalBoolRefField::new(    
+                            "gm_iclock_allowed".to_string(),
+                            &mut area.gm_iclock_allowed,
+                            false
+                        );
+                        field_collect.add_optional_field(&mut field);
 
                         // End field collect
                         field_collect.disp(ui);
