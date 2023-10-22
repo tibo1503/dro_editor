@@ -132,6 +132,14 @@ impl Editor for RoomEditor {
                         field_collect.add_optional_field(&mut field);
 
                         // AFK
+                        let mut field = OptionalUnsignedRefField::new(
+                            "afk_delay".to_string(),
+                            &mut area.afk_delay,
+                            0,
+                            0,
+                            360
+                        );
+                        field_collect.add_optional_field(&mut field);
                         
                         // Other
                         let mut field = OptionalBoolRefField::new(    
@@ -351,6 +359,52 @@ impl OptionalField for OptionalStringRefField<'_> {
     fn disp(&mut self, ui: &mut Ui) {
         if let Option::Some(ref mut data) = &mut self.data {
             ui.text_edit_singleline(data);
+        }
+    }
+    
+    fn disp_val(&self) -> bool {
+        self.data.is_some()
+    }
+
+    fn get_field_name(&self) -> String {
+        self.field_name.clone()
+    }
+    
+    fn disp_state(&mut self, state: bool) {
+        if state {
+            *self.data = Option::Some(self.default_value.clone());
+        } else {
+            *self.data = Option::None;
+        }
+    }
+}
+
+// U32
+struct OptionalUnsignedRefField<'a> {
+    data: &'a mut Option<u32>,
+    default_value: u32,
+    min: u32,
+    max: u32,
+
+    field_name: String
+}
+
+impl<'a> OptionalUnsignedRefField<'a> {
+    fn new(field_name: String, data: &'a mut Option<u32>, default_value: u32, min: u32, max: u32) -> Self {
+        Self {
+            data,
+            default_value,
+            field_name,
+            min,
+            max
+        }
+    }
+}
+
+impl OptionalField for OptionalUnsignedRefField<'_> {
+    fn disp(&mut self, ui: &mut Ui) {
+        if let Option::Some(ref mut data) = &mut self.data {
+            ui.add(egui::Slider::new(data, self.min..=self.max));
         }
     }
     
