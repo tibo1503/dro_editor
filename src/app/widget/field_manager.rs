@@ -303,14 +303,19 @@ pub struct OptionalAreaRefField<'a> {
     data: &'a mut Option<AreaRefering>,
     dro: &'a DRODataManager,
 
+    search_bar: &'a mut String,
+
     field_name: String
 }
 
 impl<'a> OptionalAreaRefField<'a> {
-    pub fn new(field_name: String, data: &'a mut Option<AreaRefering>, dro: &'a DRODataManager) -> Self {
+    pub fn new(field_name: String, data: &'a mut Option<AreaRefering>, search_bar: &'a mut String, dro: &'a DRODataManager) -> Self {
         Self {
             data,
             field_name,
+
+            search_bar,
+
             dro
         }
     }
@@ -331,10 +336,13 @@ impl OptionalField for OptionalAreaRefField<'_> {
             Option::None
         };
         ui.menu_button(menu_name, |ui| {
+            ui.text_edit_singleline(self.search_bar);
             for name in self.dro.areas.get_name_list() {
-                let selected = current_selected_area_name == Option::Some(name.clone());
-                if ui.selectable_label(selected, &name).clicked() {
-                    *self.data = self.dro.areas.get_by_name(&name);
+                if name.to_lowercase().contains(&self.search_bar.to_lowercase()) {
+                    let selected = current_selected_area_name == Option::Some(name.clone());
+                    if ui.selectable_label(selected, &name).clicked() {
+                        *self.data = self.dro.areas.get_by_name(&name);
+                    }
                 }
             }
         });
@@ -358,20 +366,20 @@ impl OptionalField for OptionalAreaRefField<'_> {
 }
 
 // -=State field store=-
-pub struct FieldStateStore<'a> {
-    search: BTreeMap<&'a str, String>,
+pub struct FieldStateStore {
+    pub main_search: String,
+    pub area_search: String,
+    pub char_search: String,
+    pub bg_search: String,
 }
 
-impl<'a> FieldStateStore<'a> {
+impl FieldStateStore {
     pub fn new() -> Self {
         Self {
-            search: BTreeMap::new(),
+            main_search: "".to_string(),
+            area_search: "".to_string(),
+            char_search: "".to_string(),
+            bg_search: "".to_string(),
         }
-    }
-}
-
-impl<'a> FieldStateStore<'a> {
-    pub fn get_search_value(&mut self, key: &'a str, default: &String) -> &mut String {
-        self.search.entry(key).or_insert(default.clone())
     }
 }

@@ -7,11 +7,11 @@ use egui::*;
 use super::editor_trait::*;
 
 // -=Room editor=-
-pub struct RoomEditor<'a> {
-    field_storage: FieldStateStore<'a>
+pub struct RoomEditor {
+    field_storage: FieldStateStore
 }
 
-impl RoomEditor<'_> {
+impl RoomEditor {
     pub fn new() -> Self {
         Self {
             field_storage: FieldStateStore::new()
@@ -19,7 +19,7 @@ impl RoomEditor<'_> {
     }
 }
 
-impl Editor for RoomEditor<'_> {
+impl Editor for RoomEditor {
     fn view(&mut self, dro: &mut DRODataManager, selected_data: &mut SelectedData, ui: &mut Ui) {
         ui.vertical(|ui| {ScrollArea::vertical().show(ui, |ui| {
         // Verify if Area is available
@@ -28,9 +28,7 @@ impl Editor for RoomEditor<'_> {
                     let mut area = area_ref_cell.borrow().clone();
                 
                     let mut field_collect = FieldCollect::new(
-                        self
-                            .field_storage
-                            .get_search_value("FIELD_COLLECT", &"".to_string())
+                        &mut self.field_storage.main_search
                     );
                 
                     // Room info
@@ -155,7 +153,8 @@ impl Editor for RoomEditor<'_> {
                     let mut field = OptionalAreaRefField::new(
                         "afk_sendto".to_string(),
                         &mut area.afk_sendto,
-                        dro
+                        &mut self.field_storage.area_search,
+                        dro,
                     );
                     field_collect.add_cat_optional_field(cat, &mut field);
                             
