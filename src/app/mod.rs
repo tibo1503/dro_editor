@@ -6,6 +6,8 @@ use editor::{
 
 mod side_panel;
 
+mod widget;
+
 use crate::worker::model::structs::{
     DRODataManager
 };
