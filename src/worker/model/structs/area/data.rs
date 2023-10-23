@@ -159,7 +159,7 @@ pub struct Area {
     pub global_allowed: Option<bool>,
 
     // AFK
-    afk_sendto: Option<AreaRefering>,
+    pub afk_sendto: Option<AreaRefering>,
     pub afk_delay: Option<u32>,
 
     // Other
