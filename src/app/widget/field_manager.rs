@@ -308,7 +308,7 @@ impl OptionalField for OptionalAreaRefField<'_> {
 
 // -=State field store=-
 pub struct FieldStateStore<'a> {
-    pub search: HashMap<&'a str, String>,
+    search: HashMap<&'a str, String>,
 }
 
 impl<'a> FieldStateStore<'a> {
@@ -316,5 +316,11 @@ impl<'a> FieldStateStore<'a> {
         Self {
             search: HashMap::new(),
         }
+    }
+}
+
+impl<'a> FieldStateStore<'a> {
+    pub fn get_search_value(&mut self, key: &'a str, default: &String) -> &mut String {
+        self.search.entry(key).or_insert(default.clone())
     }
 }

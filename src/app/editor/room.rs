@@ -26,8 +26,11 @@ impl Editor for RoomEditor<'_> {
             if let Option::Some(area_ref_cell) = area_rc.upgrade() {
                 let mut area = area_ref_cell.borrow().clone();
 
-                let search = self.field_storage.search.entry("FIELD_COLLECT").or_insert("".to_string());
-                let mut field_collect = FieldCollect::new(search);
+                let mut field_collect = FieldCollect::new(
+                    self
+                        .field_storage
+                        .get_search_value("FIELD_COLLECT", &"".to_string())
+                );
 
                 // Room info
                 let mut field = StringField::new(
