@@ -4,12 +4,12 @@ use crate::worker::model::structs::{
 };
 
 use egui::*;
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 // Field collect
 pub struct FieldCollect<'a> {
     fields: Vec<&'a mut dyn Field>,
-    optional_fields: Vec<&'a mut dyn OptionalField>,
+    optional_fields: BTreeMap<Option<&'a str>, Vec<&'a mut dyn OptionalField>>,
     search_words: &'a mut String
 }
 
@@ -17,7 +17,7 @@ impl<'a> FieldCollect<'a> {
     pub fn new(search: &'a mut String) -> Self {
         Self {
             fields: Vec::new(),
-            optional_fields: Vec::new(),
+            optional_fields: BTreeMap::new(),
             search_words: search
         }
     }
@@ -27,7 +27,33 @@ impl<'a> FieldCollect<'a> {
     }
 
     pub fn add_optional_field(&mut self, field: &'a mut dyn OptionalField) {
-        self.optional_fields.push(field);
+        self.optional_fields.entry(Option::None).or_insert(Vec::new()).push(field);
+    }
+
+    pub fn add_cat_optional_field(&mut self, cat: &'a str, field: &'a mut dyn OptionalField) {
+        let key = Option::Some(cat);
+        let cat = self.optional_fields.entry(key).or_insert(Vec::new());
+
+        cat.push(field);
+    }
+
+    fn _disp_optional_fields(ui: &mut Ui, fields: &mut Vec<&'a mut dyn OptionalField>) {
+        for field in fields {
+            if field.disp_val() {
+                ui.horizontal(|ui| {
+                    let mut remove = false;
+                    if ui.button("-").clicked() {
+                        remove = true;
+                    }
+                    if remove {
+                        field.disp_state(false);
+                    }
+                    ui.label(field.get_field_name());
+                });
+                field.disp(ui);
+                ui.end_row()
+            }
+        }
     }
 
     pub fn disp(&mut self, ui: &mut Ui) {
@@ -36,43 +62,68 @@ impl<'a> FieldCollect<'a> {
             ui.label("value");
             ui.end_row();
 
-            // Default fields
+            // -=Default fields=-
             for ref mut item in &mut self.fields {
                 ui.label(item.get_field_name());
                 item.disp(ui);
                 ui.end_row();
             }
 
-            // Added fields
-            for ref mut item in &mut self.optional_fields {
-                if item.disp_val() {
-                    ui.horizontal(|ui| {
-                        let mut remove = false;
-                        if ui.button("-").clicked() {
-                            remove = true;
-                        }
-                        if remove {
-                            item.disp_state(false);
-                        }
-                        ui.label(item.get_field_name());
-                    });
-                    item.disp(ui);
-                    ui.end_row()
+            // -=Optionals fields=-
+            // Uncathegorized
+            Self::_disp_optional_fields(
+                ui,
+                self.optional_fields.get_mut(&Option::None).unwrap()
+            );
+
+            // Categorized fields
+            for cat in &mut self.optional_fields {
+                if let Option::Some(field_name) = cat.0 {
+                    if cat.1.iter().filter(|x| x.disp_val()).count() > 0 {
+                        ui.collapsing(*field_name, |ui| {
+                            egui::Grid::new(format!("FIELD_GRID_{}", *field_name)).show(ui, |ui| {
+                                Self::_disp_optional_fields(
+                                    ui,
+                                    cat.1
+                                );
+                            });
+                        });
+                        ui.end_row();
+                    }
                 }
             }
         });
 
         // Adding optional fields
-        ui.menu_button("+".to_string(), |ui| {
-            ui.text_edit_singleline(self.search_words);
-            for ref mut item in &mut self.optional_fields {
-                if !item.disp_val() && item.get_field_name().to_lowercase().contains(&self.search_words.to_lowercase()) {
+        fn disp_options(ui: &mut Ui, fields: &mut Vec<&mut dyn OptionalField>, search: &String) {
+            for ref mut item in fields {
+                if !item.disp_val() && item.get_field_name().to_lowercase().contains(&search.to_lowercase()) {
                     let mut add = false;
                     if ui.button(item.get_field_name()).clicked() {
                         add = true
                     }
                     if add {
                         item.disp_state(true);
+                    }
+                }
+            }
+        }
+
+        ui.menu_button("+".to_string(), |ui| {
+            ui.text_edit_singleline(self.search_words);
+
+            // Uncategozied
+            if let Option::Some(fields) = &mut self.optional_fields.get_mut(&Option::None) {
+                disp_options(ui, fields, self.search_words);
+            }
+
+            // Categorized
+            for cat in &mut self.optional_fields {
+                if cat.1.iter().filter(|x| !x.disp_val()).count() > 0 {
+                    if let Option::Some(cat_name) = cat.0 {
+                        ui.collapsing(*cat_name, |ui| {
+                            disp_options(ui, cat.1, self.search_words);
+                        });
                     }
                 }
             }
@@ -308,13 +359,13 @@ impl OptionalField for OptionalAreaRefField<'_> {
 
 // -=State field store=-
 pub struct FieldStateStore<'a> {
-    search: HashMap<&'a str, String>,
+    search: BTreeMap<&'a str, String>,
 }
 
 impl<'a> FieldStateStore<'a> {
     pub fn new() -> Self {
         Self {
-            search: HashMap::new(),
+            search: BTreeMap::new(),
         }
     }
 }
