@@ -1,7 +1,8 @@
 mod editor;
 use editor::{
     editor_trait::Editor,
-    room::RoomEditor
+    room::RoomEditor,
+    background::BackgroundEditor
 };
 
 mod side_panel;
@@ -22,7 +23,8 @@ pub struct MyApp {
 
     selected_area: side_panel::SelectedData,
 
-    editor: Vec<Box<dyn Editor>>,
+    editor: BTreeMap<String, Box<dyn Editor>>,
+    editor_choice: String,
     
     dro_struct: DRODataManager, 
 }
@@ -35,13 +37,19 @@ impl Default for MyApp {
 
             selected_area: side_panel::SelectedData::default(),
             
-            editor: vec![Box::new(RoomEditor::new())],
+            editor: BTreeMap::new(),
+            editor_choice: "".to_string(),
 
             dro_struct: DRODataManager::new(),
         };
 
+        // Side panels
         app.side_panels.insert("Area".to_string(), Box::new(side_panel::RoomSidePanel::default()));
         app.side_panels.insert("Background".to_string(), Box::new(side_panel::BackgroundSidePanel::default()));
+
+        // Editor
+        app.editor.insert("Area".to_string(), Box::new(RoomEditor::new()));
+        app.editor.insert("Background".to_string(), Box::new(BackgroundEditor::new()));
 
         app
     }
@@ -91,13 +99,15 @@ impl eframe::App for MyApp {
 
 impl MyApp {
     fn right_panel(&mut self, ui: &mut Ui) {
-        //self.hello_world(ui);
+        ui.horizontal(|ui| {
+            for name in self.editor.iter() {
+                ui.selectable_value(&mut self.editor_choice, name.0.clone(), name.0);
+            }
+        });
 
-        if self.editor.is_empty() {
-            self.editor.push(Box::new(RoomEditor::new()));
+        if let Option::Some(editor) = self.editor.get_mut(&self.editor_choice) {
+            editor.view(&mut self.dro_struct, &mut self.selected_area, ui);
         }
-
-        self.editor[0].view(&mut self.dro_struct, &mut self.selected_area, ui);
     }
 
     // TODO: Remove code sample

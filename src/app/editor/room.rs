@@ -195,8 +195,4 @@ impl Editor for RoomEditor {
             }
         })});
     }
-
-    fn get_title(&self) -> String {
-        "".to_string()
-    }
 }
