@@ -12,10 +12,14 @@ use crate::worker::model::structs::{
     DRODataManager
 };
 
+use std::collections::BTreeMap;
+
 use egui::*;
 
 pub struct MyApp {
-    side_panels: Vec<Box<dyn side_panel::SidePanel>>,
+    side_panels: BTreeMap<String, Box<dyn side_panel::SidePanel>>,
+    side_panel_choice: String,
+
     selected_area: side_panel::SelectedData,
 
     editor: Vec<Box<dyn Editor>>,
@@ -25,14 +29,21 @@ pub struct MyApp {
 
 impl Default for MyApp {
     fn default() -> Self {
-        Self {
-            side_panels: vec![Box::new(side_panel::RoomSidePanel::default())],
+        let mut app = Self {
+            side_panels: BTreeMap::new(),
+            side_panel_choice: "".to_string(),
+
             selected_area: side_panel::SelectedData::default(),
             
             editor: vec![Box::new(RoomEditor::new())],
 
             dro_struct: DRODataManager::new(),
-        }
+        };
+
+        app.side_panels.insert("Area".to_string(), Box::new(side_panel::RoomSidePanel::default()));
+        app.side_panels.insert("Background".to_string(), Box::new(side_panel::BackgroundSidePanel::default()));
+
+        app
     }
 }
 
@@ -56,7 +67,20 @@ impl eframe::App for MyApp {
          });
         
         egui::SidePanel::left("my_left_panel").show(ctx, |ui| {
-            self.side_panels[0].disp(&mut self.dro_struct, &mut self.selected_area, ui);
+            let mut name = self.side_panel_choice.clone();
+            if name.as_str() == "" {
+                name = "Choice".to_string();
+            }
+            ui.menu_button(name, |ui| {
+                for name in self.side_panels.iter() {
+                    ui.selectable_value(&mut self.side_panel_choice, name.0.clone(), name.0);
+                }
+            });
+            
+            ui.separator();
+            if let Option::Some(side_panel) = self.side_panels.get_mut(&self.side_panel_choice) {
+                side_panel.disp(&mut self.dro_struct, &mut self.selected_area, ui);
+            }
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {

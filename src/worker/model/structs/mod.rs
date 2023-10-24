@@ -11,18 +11,20 @@ use area::*;
 use std::sync::Arc;
 use std::collections::HashMap;
 
+use self::background::BackgroundManager;
+
 pub struct DRODataManager {
     pub areas: AreaManager,
-    pub character: HashMap<String, Character>,
-    pub background: HashMap<String, Background>,
+    pub background: BackgroundManager,
+    pub character: HashMap<String, Background>,
 }
 
 impl DRODataManager {
     pub fn new() -> DRODataManager {
         DRODataManager {
             areas: AreaManager::new(),
+            background: BackgroundManager::new(),
             character: HashMap::new(),
-            background: HashMap::new(),
         }
     }    
 }

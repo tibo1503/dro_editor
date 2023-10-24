@@ -1,60 +1,44 @@
-use std::cell::{RefMut, RefCell};
-use std::rc::{Rc, Weak};
+pub mod data;
+pub use data::*;
 
-#[derive(Debug, Clone)]
-pub struct Background {
-    data: Rc<Rc<BackgroundData>>
+pub struct BackgroundManager {
+    data: Vec<Background>
 }
 
-impl Background {
+impl BackgroundManager {
     pub fn new() -> Self {
-        Background {
-            data: Rc::new(Rc::new(
-                BackgroundData {
-                    ..BackgroundData::default()
-                }
-            ))
+        Self {
+            data: Vec::new()
         }
     }
 
-    pub fn get_mut_data(&mut self) -> Option<Rc<BackgroundData>> {
-        Option::Some(Rc::clone(&*self.data))
+    pub fn add(&mut self, bg: Background) {
+        self.data.push(bg)
     }
-}
-
-pub struct BackgroundRef {
-    data: Weak<Rc<BackgroundData>>
-}
-
-impl From<&Background> for BackgroundRef {
-    fn from(bg: &Background) -> BackgroundRef {
-        BackgroundRef { 
-            data: Rc::downgrade(&bg.data) 
+    
+    pub fn add_by_name(&mut self, name: String) {
+        if !self.get_names().contains(&"".to_string()) {
+            let mut bg = Background::new();
+            (*bg.get_mut_data()).borrow_mut().name = name;
+            self.data.push(bg);
         }
     }
-}
 
-#[derive(Debug, Clone, Default)]
-struct BackgroundData {
-    int: i32    
-}
+    pub fn get_by_name(&mut self, name: &String) -> Option<BackgroundRef> {
+        for bg in &mut self.data {
+            if bg.get_mut_data().borrow().name == *name {
+                return Option::Some(BackgroundRef::from(&*bg));
+            }
+        }
 
-#[cfg(test)]
-mod background_test {
-    use super::{BackgroundData, Background, BackgroundRef};
+        Option::None
+    }
 
-    #[test]
-    fn background_update() {
-        let mut a = Background::new();
+    pub fn get_clone_vec(&self) -> Vec<BackgroundRef> {
+        self.data.iter().map(BackgroundRef::from).collect()
+    }
 
-        let a_ref_1 = BackgroundRef::from(&a);
-        let a_ref_2 = BackgroundRef::from(&a);
-
-        let mut x = a.get_mut_data().unwrap();
-
-        //std::rc::Rc::get_mut(&x).int = 7;
-
-        println!("{:#?}", x);
-        println!("{:#?}", x);
+    pub fn get_names(&self) -> Vec<String> {
+        self.data.iter().map(|x| x.get_data_clone().name.clone()).collect()
     }
 }
