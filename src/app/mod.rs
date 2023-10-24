@@ -92,42 +92,16 @@ impl eframe::App for MyApp {
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
-            self.right_panel(ui);
-        });
-    }
-}
-
-impl MyApp {
-    fn right_panel(&mut self, ui: &mut Ui) {
-        ui.horizontal(|ui| {
-            for name in self.editor.iter() {
-                ui.selectable_value(&mut self.editor_choice, name.0.clone(), name.0);
+            ui.horizontal(|ui| {
+                for name in self.editor.iter() {
+                    ui.selectable_value(&mut self.editor_choice, name.0.clone(), name.0);
+                }
+            });
+            ui.separator();
+    
+            if let Option::Some(editor) = self.editor.get_mut(&self.editor_choice) {
+                editor.view(&mut self.dro_struct, &mut self.selected_area, ui);
             }
         });
-
-        if let Option::Some(editor) = self.editor.get_mut(&self.editor_choice) {
-            editor.view(&mut self.dro_struct, &mut self.selected_area, ui);
-        }
     }
-
-    // TODO: Remove code sample
-    //fn hello_world(&mut self, ui: &mut Ui) {
-    //    ui.vertical(|ui| {
-    //        ui.heading("My egui Application");
-    //        ui.horizontal(|ui| {
-    //            let name_label = ui.label("Your name: ");
-    //            ui.text_edit_singleline(&mut self.name)
-    //                .labelled_by(name_label.id);
-    //        });
-    //        ui.add(egui::Slider::new(&mut self.age, 0..=120).text("age"));
-    //        if ui.button("Click each year").clicked() {
-    //            self.age += 1;
-    //        }
-    //        ui.label(format!("Hello '{}', age {}", self.name, self.age));
-    //
-    //        ui.image(egui::include_image!(
-    //            "../../assets/edit_Picasso.png"
-    //        ));
-    //    });
-    //}
 }
