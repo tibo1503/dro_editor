@@ -3,7 +3,7 @@
 use eframe::{egui, Theme};
 
 mod app;
-use app::MyApp;
+use app::DROEditor;
 
 mod worker;
 
@@ -21,7 +21,7 @@ fn main() -> Result<(), eframe::Error> {
             // This gives us image support:
             egui_extras::install_image_loaders(&cc.egui_ctx);
 
-            Box::<MyApp>::default()
+            Box::<DROEditor>::default()
         }),
     )
 }

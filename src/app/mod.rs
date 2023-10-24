@@ -17,7 +17,7 @@ use std::collections::BTreeMap;
 
 use egui::*;
 
-pub struct MyApp {
+pub struct DROEditor {
     side_panels: BTreeMap<String, Box<dyn side_panel::SidePanel>>,
     side_panel_choice: String,
 
@@ -29,7 +29,7 @@ pub struct MyApp {
     dro_struct: DRODataManager, 
 }
 
-impl Default for MyApp {
+impl Default for DROEditor {
     fn default() -> Self {
         let mut app = Self {
             side_panels: BTreeMap::new(),
@@ -55,7 +55,7 @@ impl Default for MyApp {
     }
 }
 
-impl eframe::App for MyApp {
+impl eframe::App for DROEditor {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::TopBottomPanel::top("my_panel").show(ctx, |ui| {
             ui.horizontal(|ui| {
